@@ -18,7 +18,7 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
         homewizard.setDevices(devices);
 		callback(null, true);
     } catch (error) {
-      callback(error); 
+      callback(error);
     }
 };
 
@@ -56,7 +56,7 @@ module.exports.pair = function( socket ) {
 		  }
 		});
     });
-    
+
     socket.on('disconnect', function(){
         console.log("User aborted pairing, or pairing is finished");
     });
@@ -66,7 +66,7 @@ module.exports.init = function(devices_data, callback) {
     if (homewizard.debug) {
         devices_data = homewizard.debug_devices_data;
     }
-    
+
     devices_data.forEach(function initdevice(device) {
         Homey.log('add device: ' + JSON.stringify(device));
         devices[device.id] = device;
@@ -76,11 +76,11 @@ module.exports.init = function(devices_data, callback) {
     });
     homewizard.setDevices(devices);
     homewizard.startpoll();
-    
+
     if (Object.keys(devices).length > 0) {
       startPolling();
     }
-    
+
 	Homey.log('HomeWizard driver init done');
 	callback (null, true);
 };
@@ -113,7 +113,7 @@ Homey.manager('flow').on('action.switch_scene_on', function( callback, args ){
         callback(err, false); // err
       }
     });
-});  
+});
 
 Homey.manager('flow').on('action.switch_scene_off.scene.autocomplete', function( callback, args ){
     homewizard.getScenes(args, function(err, response) {
@@ -130,7 +130,7 @@ Homey.manager('flow').on('action.switch_scene_off', function( callback, args ){
         callback(err, false); // err
       }
     });
-});  
+});
 
 
 // PRESETS
@@ -153,8 +153,8 @@ Homey.manager('flow').on('condition.check_preset', function( callback, args ){
       }
     });
 });
-	
-	
+
+
 Homey.manager('flow').on('action.set_preset', function( callback, args ){
     var uri = '/preset/' + args.preset;
     homewizard.call(args.device.id, uri, function(err, response) {
@@ -177,7 +177,7 @@ function getStatus(device_id) {
                 Homey.log('Preset was set to ' + callback);
                 devices[device_id].preset = callback;
             }
-            
+
             if (('preset' in devices[device_id]) && devices[device_id].preset != callback) {
                 devices[device_id].preset = callback;
                 Homey.log('Flow call!' + callback);
@@ -197,7 +197,7 @@ function getStatus(device_id) {
         }
     });
 }
- 
+
 function startPolling() {
     if (refreshIntervalId) {
         clearInterval(refreshIntervalId);
@@ -207,5 +207,5 @@ function startPolling() {
         Object.keys(devices).forEach(function (device_id) {
             getStatus(device_id);
         });
-    }, 1000 * 10);
+    }, 1000 * 60);
 }

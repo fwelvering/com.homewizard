@@ -110,7 +110,7 @@ function startPolling() {
         Object.keys(devices).forEach(function (device_id) {
           getStatus(device_id);
         });
-    }, 1000 * 10);
+    }, 1000 * 60);
 }
 
 function getStatus(device_id) {

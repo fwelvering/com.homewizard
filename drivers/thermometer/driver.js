@@ -11,7 +11,7 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
 		});
 		callback(null, true);
     } catch (error) {
-      callback(error); 
+      callback(error);
     }
 };
 
@@ -21,16 +21,16 @@ module.exports.pair = function( socket ) {
             var hw_devices = {};
             Object.keys(homewizard_devices).forEach(function(key) {
                 var thermometers = JSON.stringify(homewizard_devices[key].polldata.thermometers);
-                
+
                 hw_devices[key] = homewizard_devices[key];
                 hw_devices[key].polldata = {};
-                hw_devices[key].thermometers = thermometers;   
+                hw_devices[key].thermometers = thermometers;
             });
             socket.emit('hw_devices', hw_devices);
         });
     });
-    
-    socket.on('manual_add', function (device, callback) {        
+
+    socket.on('manual_add', function (device, callback) {
         if (typeof device.settings.homewizard_id == "string" && device.settings.homewizard_id.indexOf('HW_') === -1 && device.settings.homewizard_id.indexOf('HW') === 0) {
             //true
             Homey.log('Thermometer added ' + device.data.id);
@@ -41,12 +41,12 @@ module.exports.pair = function( socket ) {
             };
             callback( null, devices );
             socket.emit("success", device);
-            startPolling();   
+            startPolling();
         } else {
             socket.emit("error", "No valid HomeWizard found, re-pair if problem persists");
         }
     });
-    
+
     socket.on('disconnect', function(){
         console.log("User aborted pairing, or pairing is finished");
     });
@@ -59,7 +59,7 @@ module.exports.init = function(devices_data, callback) {
         module.exports.getSettings(device, function(err, settings){
             devices[device.id].settings = settings;
         });
-        
+
     });
     if (Object.keys(devices).length > 0) {
       startPolling();
@@ -98,28 +98,28 @@ function getStatus(device_id) {
         var homewizard_id = devices[device_id].settings.homewizard_id;
         var thermometer_id = devices[device_id].settings.thermometer_id;
         homewizard.getDeviceData(homewizard_id, 'thermometers', function(callback) {
-            
+
             if (Object.keys(callback).length > 0) {
                 try {
                     for (var index in callback){
                         if (callback[index].id == thermometer_id) {
                             var te = (callback[index].te.toFixed(1) * 2) / 2;
                             var hu = (callback[index].hu.toFixed(1) * 2) / 2;
-                            
+
                             //Check current temperature
                             if (devices[device_id].temperature != te) {
                               console.log("New TE - "+ te);
                               module.exports.realtime( { id: device_id }, "measure_temperature", te );
-                              devices[device_id].temperature = te;    
+                              devices[device_id].temperature = te;
                             } else {
                               //console.log("TE: no change");
                             }
-                            
+
                             //Check current humidity
                             if (devices[device_id].humidity != hu) {
                               console.log("New HU - "+ hu);
                               module.exports.realtime( { id: device_id }, "measure_humidity", hu );
-                              devices[device_id].humidity = hu;    
+                              devices[device_id].humidity = hu;
                             } else {
                               //console.log("HU: no change");
                             }
@@ -141,7 +141,7 @@ function getStatus(device_id) {
         }
     }
  }
- 
+
 function startPolling() {
     if (refreshIntervalId) {
       clearInterval(refreshIntervalId);
@@ -151,5 +151,5 @@ function startPolling() {
         Object.keys(devices).forEach(function (device_id) {
             getStatus(device_id);
         });
-    }, 1000 * 10);
+    }, 1000 * 60);
  }

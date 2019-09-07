@@ -11,7 +11,7 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
 		});
 		callback(null, true);
     } catch (error) {
-      callback(error); 
+      callback(error);
     }
 };
 
@@ -23,12 +23,12 @@ module.exports.pair = function( socket ) {
             Object.keys(homewizard_devices).forEach(function(key) {
                 hw_devices[key] = homewizard_devices[key];
             });
-            
+
             socket.emit('hw_devices', hw_devices);
         });
     });
-    
-    socket.on('manual_add', function (device, callback) {        
+
+    socket.on('manual_add', function (device, callback) {
         if (device.settings.homewizard_id.indexOf('HW_') === -1 && device.settings.homewizard_id.indexOf('HW') === 0) {
             //true
             Homey.log('Wattcher added ' + device.data.id);
@@ -39,12 +39,12 @@ module.exports.pair = function( socket ) {
             };
             callback( null, devices );
             socket.emit("success", device);
-            startPolling();   
+            startPolling();
         } else {
             socket.emit("error", "No valid HomeWizard found, re-pair if problem persists");
         }
     });
-    
+
     socket.on('disconnect', function(){
         console.log("User aborted pairing, or pairing is finished");
     });
@@ -98,7 +98,7 @@ module.exports.capabilities = {
             }
         }
     }
-        
+
 };
 
 // Start polling
@@ -111,7 +111,7 @@ function startPolling() {
         Object.keys(devices).forEach(function (device_id) {
           getStatus(device_id);
         });
-    }, 1000 * 10);
+    }, 1000 * 60);
 }
 
 function getStatus(device_id) {
@@ -123,16 +123,16 @@ function getStatus(device_id) {
                     module.exports.setAvailable({id: device_id});
                     var energy_current_cons = ( callback[0].po ); // WATTS Energy used JSON $energymeters[0]['po']
                     var energy_daytotal_cons = ( callback[0].dayTotal ); // KWH Energy used JSON $energymeters[0]['dayTotal']
-                    
+
                      // Wattcher elec current
                      module.exports.realtime( { id: device_id }, "measure_power", energy_current_cons );
                      // Wattcher elec total day
                      module.exports.realtime( { id: device_id }, "meter_power", energy_daytotal_cons );
-                     
-                     console.log("Wattcher usage- "+ energy_current_cons); 
-                     console.log("Wattcher Daytotal- "+ energy_daytotal_cons); 
+
+                     console.log("Wattcher usage- "+ energy_current_cons);
+                     console.log("Wattcher Daytotal- "+ energy_daytotal_cons);
                 } catch (err) {
-                    // Error with Wattcher no data in Energymeters 
+                    // Error with Wattcher no data in Energymeters
                     console.log ("No Wattcher found");
                     module.exports.setUnavailable({id: device_id}, "No Wattcher found" );
                 }
@@ -149,5 +149,3 @@ function getStatus(device_id) {
         }
     }
 }
-
-

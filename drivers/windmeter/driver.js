@@ -11,7 +11,7 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
 		});
 		callback(null, true);
     } catch (error) {
-      callback(error); 
+      callback(error);
     }
 };
 
@@ -23,12 +23,12 @@ module.exports.pair = function( socket ) {
             Object.keys(homewizard_devices).forEach(function(key) {
                 hw_devices[key] = homewizard_devices[key];
             });
-            
+
             socket.emit('hw_devices', hw_devices);
         });
     });
-    
-    socket.on('manual_add', function (device, callback) {        
+
+    socket.on('manual_add', function (device, callback) {
         if (device.settings.homewizard_id.indexOf('HW_') === -1 && device.settings.homewizard_id.indexOf('HW') === 0) {
             //true
             Homey.log('Windmeter added ' + device.data.id);
@@ -39,12 +39,12 @@ module.exports.pair = function( socket ) {
             };
             callback( null, devices );
             socket.emit("success", device);
-            startPolling();   
+            startPolling();
         } else {
             socket.emit("error", "No valid HomeWizard found, re-pair if problem persists");
         }
     });
-    
+
     socket.on('disconnect', function(){
         console.log("User aborted pairing, or pairing is finished");
     });
@@ -165,7 +165,7 @@ function startPolling() {
         Object.keys(devices).forEach(function (device_id) {
           getStatus(device_id);
         });
-    }, 1000 * 10);
+    }, 1000 * 60);
 }
 
 function getStatus(device_id) {
@@ -191,8 +191,8 @@ function getStatus(device_id) {
 					// Console data
 				    var wind_angle_str = wind_angle_int[1];
 				    var wind_angle = parseInt(wind_angle_str);
-				    console.log("Windangle in degrees: "+ wind_angle); 
-                    console.log("Windspeed in km/u: "+ wind_strength_current); 
+				    console.log("Windangle in degrees: "+ wind_angle);
+                    console.log("Windspeed in km/u: "+ wind_strength_current);
 					console.log("Min Windspeed in km/u: "+ wind_strength_min);
 					console.log("Min Windspeed in km/u: "+ wind_strength_max);
 					console.log("Gust strength in km/u: "+ gust_strength);
@@ -213,15 +213,15 @@ function getStatus(device_id) {
 					// Temp Windchill
                     module.exports.realtime( { id: device_id }, "measure_temperature.windchill", temp_windchill );
 					// Console data
-					console.log("Windangle in degrees: "+ wind_angle); 
-                    console.log("Windspeed in km/u: "+ wind_strength_current); 
+					console.log("Windangle in degrees: "+ wind_angle);
+                    console.log("Windspeed in km/u: "+ wind_strength_current);
 					console.log("Min Windspeed in km/u: "+ wind_strength_min);
 					console.log("Min Windspeed in km/u: "+ wind_strength_max);
 					console.log("Gust strength in km/u: "+ gust_strength);
 					console.log("Temperature current: "+ temp_real);
 					console.log("Temperature windchill: "+ temp_windchill);
                 } catch (err) {
-                    // Error with Wind no data in Rainmeters 
+                    // Error with Wind no data in Rainmeters
                     console.log ("No Windmeter found");
                     module.exports.setUnavailable({id: device_id}, "No Windmeter found" );
                 }
@@ -238,5 +238,3 @@ function getStatus(device_id) {
         }
     }
 }
-
-
